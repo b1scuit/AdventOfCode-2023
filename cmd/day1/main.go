@@ -12,19 +12,6 @@ import (
 	"unicode"
 )
 
-var numbers = []string{
-	"one",
-	"two",
-	"three",
-	"four",
-	"five",
-	"six",
-	"seven",
-	"eight",
-	"nine",
-	"zero",
-}
-
 func main() {
 	// Some random shite
 	now := time.Now()
