@@ -2,10 +2,12 @@ package lineswapper
 
 import "strings"
 
+// Overkill, but fun
 type LineFunc func(*LineSwapper) LineFunc
 
 type LineSwapper struct {
 	Pos int
+	Rev bool
 
 	Buf string
 
@@ -17,6 +19,13 @@ type LineOption func(*LineSwapper)
 func WithInput(s string) LineOption {
 	return func(ls *LineSwapper) {
 		ls.Buf = s
+	}
+}
+
+func Reverse() LineOption {
+	return func(ls *LineSwapper) {
+		ls.Rev = true
+		ls.Pos = len(ls.Buf)
 	}
 }
 
@@ -44,18 +53,35 @@ func (ls *LineSwapper) Do() string {
 
 // Lots of functions
 func (ls *LineSwapper) IsEof() bool {
+
+	if ls.Rev {
+		return ls.Pos == 0
+	}
+
 	return (ls.Pos >= len(ls.Buf))
 }
 
 func (ls *LineSwapper) Inc() {
-	ls.Pos++
+	if ls.Rev {
+		ls.Pos--
+	} else {
+		ls.Pos++
+	}
 }
 
 func (ls *LineSwapper) ResetPos() {
-	ls.Pos = 0
+	if ls.Rev {
+		ls.Pos = len(ls.Buf)
+	}
+
+	ls.Pos += 1
 }
 
 func (ls *LineSwapper) InputToEnd() string {
+	if ls.Rev {
+		return ls.Buf[:ls.Pos]
+	}
+
 	return ls.Buf[ls.Pos:]
 }
 
@@ -117,7 +143,6 @@ func isOne(s string) bool {
 
 func LexOne(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "one", "1", 1)
-
 	return StartHell
 }
 
@@ -126,7 +151,6 @@ func isTwo(s string) bool {
 }
 func LexTwo(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "two", "2", 1)
-
 	return StartHell
 }
 
@@ -135,7 +159,6 @@ func isThree(s string) bool {
 }
 func LexThree(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "three", "3", 1)
-
 	return StartHell
 }
 
@@ -144,7 +167,6 @@ func isFour(s string) bool {
 }
 func LexFour(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "four", "4", 1)
-
 	return StartHell
 }
 func isFive(s string) bool {
@@ -152,7 +174,6 @@ func isFive(s string) bool {
 }
 func LexFive(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "five", "5", 1)
-
 	return StartHell
 }
 func isSix(s string) bool {
@@ -160,7 +181,6 @@ func isSix(s string) bool {
 }
 func LexSix(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "six", "6", 1)
-
 	return StartHell
 }
 func isSeven(s string) bool {
@@ -168,7 +188,6 @@ func isSeven(s string) bool {
 }
 func LexSeven(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "seven", "7", 1)
-
 	return StartHell
 }
 func isEight(s string) bool {
@@ -176,7 +195,6 @@ func isEight(s string) bool {
 }
 func LexEight(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "eight", "8", 1)
-
 	return StartHell
 }
 func isNine(s string) bool {
@@ -184,6 +202,5 @@ func isNine(s string) bool {
 }
 func LexNine(l *LineSwapper) LineFunc {
 	l.Buf = strings.Replace(l.Buf, "nine", "9", 1)
-
 	return StartHell
 }

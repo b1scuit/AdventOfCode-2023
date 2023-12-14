@@ -7,12 +7,15 @@ import (
 	"os"
 	"slices"
 	"strconv"
+	"sync"
 	"time"
 	"unicode"
 
 	"github.com/b1scuit/adventofcode-2023/lineswapper"
 )
 
+// fivesevenfour9jslninesevenjtttt7oneightssr is the current problem
+// should end up as 58 but instead comes out as 51 as numbers are parsed L->R
 func main() {
 	// Some random shite
 	now := time.Now()
@@ -40,20 +43,30 @@ func main() {
 	}
 
 	// Now the file is something neat and simple to work with, we can sort things out
+	var totalMutex sync.Mutex
 	var total int = 0
+	var wg sync.WaitGroup
 	for _, line := range fileLines {
-		swappedLine := lineswapper.New(lineswapper.WithInput(line)).Do()
+		wg.Add(1)
+		go func(wg *sync.WaitGroup, line string) {
+			defer wg.Done()
+			// Walk through the line and pick out the numbers
 
-		// Walk through the line and pick out the numbers
-		lineValue := Walk(swappedLine) + WalkBack(swappedLine)
+			line1 := LexLine(line)
 
-		value, err := strconv.Atoi(lineValue)
-		if err != nil {
-			slog.Error("Error converting string", slog.Any("error", err))
-		}
+			lineValue := Walk(line1) + WalkBack(line1)
 
-		total = total + value
+			value, err := strconv.Atoi(lineValue)
+			if err != nil {
+				slog.Error("Error converting string", slog.Any("error", err))
+			}
+			totalMutex.Lock()
+			total = total + value
+			totalMutex.Unlock()
+		}(&wg, line)
 	}
+
+	wg.Wait()
 
 	slog.Info("Calculation Total", slog.Int("total", total))
 
@@ -77,4 +90,6 @@ func WalkBack(s string) string {
 	return Walk(string(b))
 }
 
-// Overkill, but fun
+func LexLine(s string) string {
+	return lineswapper.New(lineswapper.WithInput(s)).Do()
+}

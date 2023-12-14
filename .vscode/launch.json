@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/cmd/day1/main.go",
             "args": [
                 "--file",
-                "./assets/day1/challange.txt"
+                "./assets/day1/examples-pt2.txt"
             ],
             "cwd": "${workspaceFolder}"
         }
